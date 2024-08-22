@@ -50,6 +50,12 @@ body {
     text-align: center;
 }
 
+.score {
+    margin-top: 10px;
+    font-size: 1.2em;
+    text-align: center;
+}
+
 #restart {
     display: none;
     margin-top: 20px;

@@ -2,6 +2,7 @@ const bird = document.querySelector('.bird');
 const pipeTop = document.querySelector('.pipe-top');
 const pipeBottom = document.querySelector('.pipe-bottom');
 const statusDisplay = document.querySelector('.status');
+const scoreDisplay = document.querySelector('.score');
 const restartButton = document.getElementById('restart');
 
 let birdY = 250;
@@ -10,13 +11,17 @@ let gravity = 0.5;
 let isGameOver = false;
 let pipeX = 400;
 let gap = 150;
+let score = 0;
+
 
 const startGame = () => {
     birdY = 250;
     birdVelocity = 0;
     pipeX = 400;
     isGameOver = false;
+    score = 0;
     statusDisplay.innerHTML = "";
+    scoreDisplay.innerHTML = "Puntuación: 0";
     restartButton.style.display = "none";
     gameLoop();
 };
@@ -34,6 +39,8 @@ const gameLoop = () => {
         const randomHeight = Math.floor(Math.random() * (400 - gap)) + 50;
         pipeTop.style.height = randomHeight + 'px';
         pipeBottom.style.height = (400 - randomHeight - gap) + 'px';
+        score++;
+        scoreDisplay.innerHTML = `Puntuación: ${score}`;
     }
     
     pipeTop.style.left = pipeX + 'px';
@@ -42,7 +49,7 @@ const gameLoop = () => {
     if (
         birdY <= 0 || birdY >= 560 || 
         (pipeX < 90 && pipeX > 30 && 
-         (birdY < parseInt(pipeTop.style.height) || birdY > 600 - parseInt(pipeBottom.style.height)))
+        (birdY < parseInt(pipeTop.style.height) || birdY > 600 - parseInt(pipeBottom.style.height)))
     ) {
         gameOver();
     } else {
