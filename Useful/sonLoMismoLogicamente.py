@@ -154,8 +154,99 @@ def resolverFormula(s: list[str]):
         s = reemplazarFormulaMasBasica(s, str(valorLogicoFormualaBasica(buscarFormulaMasBasica(s))))
         #resolverFormulasMasBasicas(s)
     return valorLogicoFormualaBasica(s)
+
+
+def esOperacion(elemento: str):
+    if (esAnd(elemento) or esOr(elemento) or esParentesisAbierto(elemento) or esParentesisCerrado(elemento) or esNegacion(elemento)):
+        return True
+    return False
+
+#Devuelve la cantidad de variables que hay
+def contarCantidadVariables(formula: list[str]):
+    return len(variablesDeFormula(formula))
+
+
+#Devuelve un set con todas las variables, sin repetir
+def variablesDeFormula(formula: list[str]):
+    variables = set()
+    for elemento in formula:
+        if (not esOperacion(elemento) and not esValorTrueOrFalse(elemento)):
+            variables.add(elemento)
+    return variables
+
+def printFormula(formula: list[str]):
+    for i in formula:
+        print(i, end=" ")
+    print()
+
+def printValorVariables(valorVariables: str):
+    for i in range(len(valorVariables)):
+        print(valorVariables[i] + " ", end=" ")
+
+def printArrayVariables(array_variables: list[str]): 
+    for i in array_variables:
+        print(i + " ", end= ' ')
+# Diccionario con variables no puede tener como llaves, AND, -, OR (basicamente los operadores)
+# Las llaves del diccionario solo tienen valores "True" o "False"
+# Devuelve la formula, con los reemplazos sintacticos dichos en el diccionario
+def instanciarVariables(formulaConVariables: list[str], diccionarioValorVariable: dict[str, str]) -> list[str]:
+    res: list[str] = []
+    for i in formulaConVariables:
+        if i in diccionarioValorVariable:
+            res.append(diccionarioValorVariable[i])
+        else:
+            res.append(i)
+    return res
+
+def evaluarFormulaConVariablesEnCiertaAsignacion(formulaConVariables: list[str], diccionarioValorVariable: dict[str, str]) -> bool:
+    formula: list[str] = instanciarVariables(formulaConVariables, diccionarioValorVariable)
+    return resolverFormula(formula)
+
+def convertirSetEnArray(set: set[str]) -> list[str]:
+    res: list[str] = []
+    for i in set:
+        res.append(i)
+    return res
+
+def evaluarConTodasLasPosibilidades(formulaConVariables: list[str]):
+    variables_set: set[str] = variablesDeFormula(formulaConVariables)
+    variables_array = convertirSetEnArray(variables_set)
+    printArrayVariables(variables_array)
+    printFormula(formulaConVariables)
+    for i in range(pow(2, len(variables_array))):
+        numero_en_binario = convertirNumeroDecimalEnBinario(i, len(variables_array))
+        diccionario_variables = {}
+        for index in range(len(numero_en_binario)):
+            diccionario_variables[variables_array[index]] = convertir1y0EnTrueYFalse(numero_en_binario[index])
+        printValorVariables(numero_en_binario)
+        print(evaluarFormulaConVariablesEnCiertaAsignacion(formulaConVariables, diccionario_variables))
+    return
+
+def convertir1y0EnTrueYFalse(str: str) -> str:
+    if (str == "0"):
+        return "False"
+    return "True"
+
+def convertirNumeroDecimalEnBinario(num: int, cantidad_bits: int) -> str:
+    res: str = ""
+    if (num == 0):
+        res = "0" * cantidad_bits
+    else:
+        while (num != 0):
+            mod_2 = num % 2
+            res = str(mod_2) + res
+            num = (num -mod_2) // 2
+        if (len(res) > cantidad_bits):
+            return "ERROR. Overflow"
+        else:
+            cuanto_falta_para_llenar_bits = cantidad_bits - len(res)
+            res = "0" * cuanto_falta_para_llenar_bits + res 
+    return res
+
+formulaVariables: list[str] = ["-", "(", "P", "OR", "Q", ")"]    
 formula: list[str] = ["-", "True", "OR", "-", "(", "False", "AND", "-", "TRUE", ")"]
-for i in formula:
-    print(i, end=" ")
-print()
-print(resolverFormula(formula))
+
+printFormula(formulaVariables)
+
+evaluarConTodasLasPosibilidades(formulaVariables)
+#print(convertirNumeroDecimalEnBinario(16, 5))
