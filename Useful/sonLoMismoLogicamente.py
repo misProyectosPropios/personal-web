@@ -82,4 +82,80 @@ def esValorTrueOrFalse(string: str) -> bool:
         res = True
     return res
 
-print(valorLogicoFormualaBasica(["-", "True", "AND", "False",]))
+def esParentesisAbierto(string: str) -> bool:
+    res: bool = False
+    if (string == "("):
+        res = True
+    return res
+
+def esParentesisCerrado(string: str) -> bool:
+    res: bool = False
+    if (string == ")"):
+        res = True
+    return res
+
+def hayParentesis(s: list[str]) -> bool:
+    for i in s:
+        if (i == "("):
+            return True
+    return False
+
+# Voy a suponer que, como se llamo a esta función, hay al menos un parentesis de abierto y 
+# otro de cerrar
+#
+def buscarFormulaMasBasica(s: list[str]):
+    res: list[str] = []
+    dentroDeParentesis: bool = False
+    for i in s:
+        if (esParentesisAbierto(i)):
+            dentroDeParentesis = True
+        elif (esParentesisCerrado(i)):
+            return res
+        elif (dentroDeParentesis and esParentesisAbierto(i)):
+            res = []
+        elif (dentroDeParentesis):
+            res.append(i)
+    return res
+        
+def appendListOfStringsToListOfStrings(s: list[str], toConcatenate: list[str]) -> list[str]:
+    for i in toConcatenate:
+        s.append(i)
+    
+def reemplazarFormulaMasBasica(s: list[str], valorDeLaFormula: bool) -> list[str]:
+    res: list[str] = []
+    yaSeReemplazo: bool = False
+    almacenDeFormulas: list[str] = []
+    dentroDeParentesis: bool = False
+    for i in s:
+        if (yaSeReemplazo):
+            res.append(i)
+        elif (esParentesisAbierto(i)):
+            if (len(almacenDeFormulas) != 0 and dentroDeParentesis):
+                res.append("(")
+                appendListOfStringsToListOfStrings(res, almacenDeFormulas)
+                res.append(almacenDeFormulas)
+            if (len(almacenDeFormulas) != 0):
+                appendListOfStringsToListOfStrings(res, almacenDeFormulas)
+            almacenDeFormulas = []
+            dentroDeParentesis = True
+        elif (esParentesisCerrado(i)):
+            res.append(valorDeLaFormula)
+            yaSeReemplazo = True
+            almacenDeFormulas = []
+        else:
+            almacenDeFormulas.append(i)
+        
+    return res
+
+def resolverFormula(s: list[str]):
+    formula: list[str]
+    
+    while (hayParentesis(s)):
+        s = reemplazarFormulaMasBasica(s, str(valorLogicoFormualaBasica(buscarFormulaMasBasica(s))))
+        #resolverFormulasMasBasicas(s)
+    return valorLogicoFormualaBasica(s)
+formula: list[str] = ["-", "True", "OR", "-", "(", "False", "AND", "-", "TRUE", ")"]
+for i in formula:
+    print(i, end=" ")
+print()
+print(resolverFormula(formula))
